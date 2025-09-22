@@ -120,3 +120,23 @@ FULL OUTER JOIN dept d ON e.dept_id = d.dept_id;
 
 Applications:
 - Combine data from multiple tables
+
+````````````````````````````````````
+USER 
+````````````````````````````````````
+# Create User
+CREATE USER 'student2'@'localhost' IDENTIFIED BY 'Password123';
+
+# Show Grants
+SHOW GRANTS FOR 'student2'@'localhost';
+
+# Grant Permissions
+GRANT SELECT, INSERT ON company_db.employees TO 'student2'@'localhost';
+
+# Revoke Permissions
+REVOKE INSERT ON company_db.employees FROM 'student2'@'localhost';
+
+# Drop User
+DROP USER 'student2'@'localhost';
+
+SELECT user, host FROM mysql.user;
