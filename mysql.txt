@@ -1,0 +1,122 @@
+-------------------------------
+DB Creation
+-------------------------------
+# Create Database
+CREATE DATABASE mydb;
+
+# Use Database
+USE mydb;
+
+# Drop Database
+DROP DATABASE mydb;
+
+Applications:
+- Creating and managing databases for projects
+
+-------------------------------
+Table Creation and inserting
+-------------------------------
+# Create Table
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    salary DECIMAL(10,2)
+);
+
+# Insert Data
+INSERT INTO employees VALUES (1, 'Alice', 25, 40000.00);
+INSERT INTO employees (emp_id, name) VALUES (2, 'Bob');
+
+Applications:
+- Store structured data
+
+-------------------------------
+Updating and altering table
+-------------------------------
+# Update Data
+UPDATE employees SET salary = 50000 WHERE emp_id = 1;
+
+# Alter Table - Add Column
+ALTER TABLE employees ADD department VARCHAR(30);
+
+# Alter Table - Modify Column
+ALTER TABLE employees MODIFY age SMALLINT;
+
+# Alter Table - Drop Column
+ALTER TABLE employees DROP COLUMN department;
+
+Applications:
+- Change schema and update values
+
+-------------------------------
+Constraints
+-------------------------------
+# Primary Key
+CREATE TABLE dept (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50) NOT NULL
+);
+
+# Unique
+ALTER TABLE employees ADD CONSTRAINT unique_name UNIQUE (name);
+
+# Foreign Key
+ALTER TABLE employees ADD CONSTRAINT fk_dept FOREIGN KEY (dept_id) REFERENCES dept(dept_id);
+
+# Check
+ALTER TABLE employees ADD CONSTRAINT chk_age CHECK (age >= 18);
+
+# Not Null
+name VARCHAR(50) NOT NULL;
+
+Applications:
+- Ensure data integrity
+
+-------------------------------
+Aggregates
+-------------------------------
+# Count, Sum, Avg, Min, Max
+SELECT COUNT(*) FROM employees;
+SELECT SUM(salary) FROM employees;
+SELECT AVG(salary) FROM employees;
+SELECT MIN(salary) FROM employees;
+SELECT MAX(salary) FROM employees;
+
+# Group By
+SELECT department, AVG(salary) FROM employees GROUP BY department;
+
+# Having
+SELECT department, AVG(salary) 
+FROM employees 
+GROUP BY department 
+HAVING AVG(salary) > 45000;
+
+Applications:
+- Data analysis, reports
+
+-------------------------------
+Joins
+-------------------------------
+# Inner Join
+SELECT e.name, d.dept_name
+FROM employees e
+INNER JOIN dept d ON e.dept_id = d.dept_id;
+
+# Left Join
+SELECT e.name, d.dept_name
+FROM employees e
+LEFT JOIN dept d ON e.dept_id = d.dept_id;
+
+# Right Join
+SELECT e.name, d.dept_name
+FROM employees e
+RIGHT JOIN dept d ON e.dept_id = d.dept_id;
+
+# Full Outer Join (if supported)
+SELECT e.name, d.dept_name
+FROM employees e
+FULL OUTER JOIN dept d ON e.dept_id = d.dept_id;
+
+Applications:
+- Combine data from multiple tables

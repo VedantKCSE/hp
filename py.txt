@@ -1,0 +1,223 @@
+Basics
+---------------------------
+- input
+a = input("Enter something: ")
+
+- type-casting
+a = int(input("Enter an integer: "))
+b = float(input("Enter a float: "))
+c = list(input("Enter chars: "))     # 'abc' → ['a','b','c']
+d = tuple(input("Enter chars: "))    # 'abc' → ('a','b','c')
+
+Applications:
+- Convert user input into required type
+- Process mathematical operations after casting
+
+-------------------------------
+Looping & Control Structure
+-------------------------------
+# If-Else
+if x > 0:
+    print("Positive")
+elif x == 0:
+    print("Zero")
+else:
+    print("Negative")
+
+# While loop
+i = 1
+while i <= 5:
+    print(i)
+    i += 1
+
+# For loop
+for i in range(1, 6):
+    print(i)
+
+# Nested loop
+for i in range(3):
+    for j in range(2):
+        print(i, j)
+
+# Jump statements
+for i in range(5):
+    if i == 2:
+        continue
+    if i == 4:
+        break
+    print(i)
+
+-------------------------------
+List Operations
+-------------------------------
+l = [1, 2, 3, "python", 4.5]
+l.append(6)
+l.insert(2, 99)
+l.remove(3)
+l.pop()
+l.pop(1)
+l.sort()
+l.reverse()
+l.index(99)
+l.count(2)
+
+Applications:
+- Store multiple values
+- Dynamic operations like stack/queue
+
+-------------------------------
+Tuple Operations
+-------------------------------
+t = (1, 2, 3, "python", 4.5)
+t.count(2)
+t.index(3)
+
+Applications:
+- Immutable, faster than list
+- Store fixed data like coordinates, DB records
+
+-------------------------------
+Dictionary Operations
+-------------------------------
+d = {"name": "Vedant", "age": 21, "city": "Pune"}
+d["age"] = 22
+d["email"] = "x@y.com"
+d.pop("city")
+d.keys()
+d.values()
+d.items()
+
+Applications:
+- Key-value storage (fast lookup)
+- Handle JSON-like data
+
+-------------------------------
+Regular Expressions
+-------------------------------
+import re
+
+re.match(pattern, string)
+re.search(pattern, string)
+re.findall(pattern, string)
+re.sub(pattern, repl, string)
+
+Patterns:
+\d digit
+\w word char
+\s whitespace
++ one or more
+* zero or more
+. any character
+
+Example:
+text = "My number is 9876543210"
+pattern = r"\d{10}"
+match = re.search(pattern, text)
+print(match.group())
+
+-------------------------------
+OOPJ
+-------------------------------
+class Student:
+    def __init__(self, name, roll):
+        self.name = name
+        self.roll = roll
+    
+    def display(self):
+        print(self.name, self.roll)
+
+s = Student("Vedant", 1)
+s.display()
+
+# Inheritance
+class A:
+    def show(self):
+        print("Class A")
+
+class B(A):
+    def display(self):
+        print("Class B")
+
+obj = B()
+obj.show()
+obj.display()
+
+Applications:
+- Encapsulation, reusability, real-world modeling
+
+-------------------------------
+File & Directory Access
+-------------------------------
+# File Handling
+with open("test.txt", "w") as f:
+    f.write("Hello Python")
+
+with open("test.txt", "r") as f:
+    print(f.read())
+
+with open("test.txt", "a") as f:
+    f.write("\nExtra line")
+
+# Directory
+import os
+print(os.getcwd())
+os.mkdir("newfolder")
+os.listdir()
+os.remove("test.txt")
+
+-------------------------------
+Plugins
+-------------------------------
+# Built-in
+import math
+print(math.sqrt(16))
+
+# External
+# pip install requests
+import requests
+res = requests.get("https://example.com")
+print(res.text)
+
+----------------------------
+Socket Programming
+----------------------------
+# server.py
+import socket
+import re
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind(('localhost', 12345))
+server_socket.listen(1)
+print("Server listening on port 12345...")
+
+client_socket, client_address = server_socket.accept()
+print(f"Connected to {client_address}")
+
+filename = client_socket.recv(1024).decode()
+print(f"Requested file: {filename}")
+
+try:
+    with open(filename, 'r') as file:
+        response = file.read()
+except FileNotFoundError:
+    response = "ERROR: File not found."
+except Exception as e:
+    response = f"ERROR: {str(e)}"
+
+client_socket.send(response.encode())
+client_socket.close()
+server_socket.close()
+
+# client.py
+import socket
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('localhost', 12345))
+
+filename = input("Enter the filename (e.g., 'sample.txt'): ")
+client_socket.send(filename.encode())
+
+response = client_socket.recv(4096).decode()
+print(response)
+
+client_socket.close()
