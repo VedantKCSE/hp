@@ -23,7 +23,7 @@ pipeline {
         }
 				stage('Docker Run (Optional)'){
 					steps {
-						sh "docker run --rm ${DOCKER_IMAGE}"
+						sh "docker run ${DOCKER_IMAGE}"
 					}
 				}
     }
