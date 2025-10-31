@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                   	//Check if Docker File Exist
-										if(fileExists('DockerFile')){
+										if(fileExists('Dockerfile')){
 											sh "docker build -t ${DOCKER_IMAGE} ."
 										} else {
 											error "Dockerfile not found in WS. ❌"
