@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                	git branch: 'main', url 'https://github.com/VedantKCSE/hp.git'
+                	git branch: 'main', url: 'https://github.com/VedantKCSE/hp.git'
             }
         }
         stage('Docker Build'){
