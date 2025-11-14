@@ -1,0 +1,696 @@
+    1  tar -xvzf VMwareTools-10.3.25-20206839.tar.gz 
+    2  cd V
+    3  cd vmware-tools-distrib/
+    4  ls
+    5  ./vmware-install.pl 
+    6  sudo su
+    7  clear
+    8  sudo apt install open-vm-tools-desktop
+    9  sudo apt-get updat
+   10  sudo apt install apache2 xca
+   11  systemctl start apache2
+   12  systemctl status apache2
+   13  clear
+   14  sudo apt-get install ca-certificates curl
+   15  sudo install -m 0755 -d /etc/apt/keyrings
+   16  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+   17  sudo chmod a+r /etc/apt/keyrings/docker.asc
+   18  echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+   19    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   20  echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+   21    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   22  sudo apt-get update
+   23  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   24  sudo usermod -aG docker $USER
+   25  newgrp docker
+   26  echo "alias kubectl='microk8s kubectl'">>~/.bashrc
+   27  source ~/.bashrc
+   28  kubectl get nodes
+   29  kubectl get all
+   30  sudo apt install font-config openjdk-17-jre
+   31  sudo apt-get update
+   32  sudo apt install font-config openjdk-17-jre
+   33  sudo apt install  openjdk-17-jre
+   34  sudo apt install  openjdk-17-jdk-headless
+   35  sudo apt install fontconfig 
+   36  sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc   https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+   37  echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]"   https://pkg.jenkins.io/debian-stable binary/ | sudo tee   /etc/apt/sources.list.d/jenkins.list > /dev/null
+   38  sudo apt update
+   39  sudo apt install jenkins
+   40  systemctl start jenkins
+   41  systemctl status jenkins
+   42  sudo su
+   43  journalctl -u jenkins.service
+   44  cd ..
+   45  ls
+   46  sudo systemctl -aG docker jenkins
+   47  sudo usermod -aG docker jenkins
+   48  systemctl restart jenkins
+   49  docker login
+   50  history
+   51  ls
+   52  groups $USER
+   53  docker ps
+   54  sudo snap install microk8s
+   55  sudo snap install microk8s --classic
+   56  sudo usermod -aG microk8s $USER
+   57  newgrp microk8s
+   58  ls
+   59  ip -br a
+   60  sudo apt install openshh-server
+   61  sudo apt install openssh-serve
+   62  systemctl status sshdd
+   63  systemctl status sshd
+   64  systemctl status ss
+   65  systemctl status ssh
+   66  systemctl start ssh
+   67  systemctl status ssh
+   68  systemctl enable ssh
+   69  systemctl status ssh
+   70  clear
+   71  ls
+   72  docker --help
+   73  clear
+   74  git clone https://github.com/VedantKCSE/hp.git
+   75  ls
+   76  mkdir lab
+   77  mv hp/ lab/
+   78  ls
+   79  cd lab/
+   80  ls
+   81  cd hp/
+   82  ls
+   83  git status
+   84  cat test.txt 
+   85  cat >> test.txt 
+   86  git status
+   87  git add test.txt 
+   88  git commit -m "Checking Push"
+   89  git config --global user.email "ved@origin7.in"
+   90  git config --global user.name "Ved"
+   91  git commit -m "Checking Push"
+   92  git push origin main
+   93  git status
+   94  clear
+   95  exit
+   96  ls
+   97  exit
+   98  cd 
+   99  ls
+  100  clea
+  101  clear
+  102  ls
+  103  cd lab/
+  104  ls
+  105  cdh
+  106  cd hp/
+  107  ;s
+  108  ls
+  109  clear
+  110  cd ..
+  111  mkdir PKI
+  112  ls
+  113  cd PKI/
+  114  ls
+  115  clear
+  116  openssl genpkey -algorithm RSA -out EXRootCA.key -aes256
+  117  ls
+  118  openssl req -new -key EXRootCA.key -out EXRootCA.csr
+  119  ls
+  120  openssl x509 -req -in EXRootCA.csr -signkey EXRootCA.key -out EXRootCA.crt -days 3650
+  121  ls
+  122  history
+  123  clear
+  124  ls
+  125  openssl genpkey -algorithm RSA -out EXSubCA.key -aes256
+  126  ls
+  127  openssl req -new -key EXSubCA.key -out EXSubCA.csr
+  128  ls
+  129  openssl x509 -req -in EXSubCA.csr -CA EXRootCA.crt -CAkey EXRootCA.key -CAcreateserial -out EXSubCA.crt -days 1825
+  130  ls
+  131  openssl x509 -in EXSubCA.crt -text -noout
+  132  clear
+  133  openssl genpkey -algorithm RSA -out joshi.gg.key -aes256
+  134  openssl req -new -key joshi.gg.key -out joshi.gg.csr
+  135  ld
+  136  ls
+  137  openssl x509 -req -in joshi.gg.csr -CA EXSubCA.crt -CAkey EXSubCA.key -CAcreateserial -out joshi.gg.crt -days 1825
+  138  ls
+  139  clear
+  140  cd /etc/apache2/sites-available/
+  141  ls
+  142  sudo nano joshi.gg.conf
+  143  a2enmod ssl
+  144  sudo a2enmod ssl
+  145  sudo a2ensite joshi.gg
+  146  ifconfig
+  147  sudo nano /etc/hosts
+  148  host joshi.gg
+  149  curl joshi.gg
+  150  clear
+  151  systemctl restart apache2.service 
+  152  journalctl -xeu apache2.service
+  153  ls
+  154  sudo nano joshi.gg.conf 
+  155  systemctl restart apache2.service 
+  156  curl https://joshi.gg
+  157  clear
+  158  cd 
+  159  ls
+  160  rm joshi.gg.pem 
+  161  cd lab/
+  162  ls
+  163  cd PKI/
+  164  ls
+  165  clear
+  166  cd ..
+  167  ls
+  168  mkdir personel
+  169  cd personel/
+  170  ls
+  171  clear
+  172  openssl genpkey -algorithm RSA -out alice.key -aes256
+  173  ls
+  174  openssl genpkey -algorithm RSA -out bob.key -aes256
+  175  clea
+  176  clear
+  177  ls
+  178  openssl pkey -in alice.key -pubout -out alice_pub.key 
+  179  ls
+  180  openssl pkey -in bob.key -pubout -out bob_pub.key 
+  181  ls
+  182  clear
+  183  ls
+  184  cat > txt
+  185  openssl pkeyutl -encrypt -in txt -out cipher.bin -pubin -inkey bob_pub.key 
+  186  ls
+  187  cat cipher.bin 
+  188  openssl dgst -sha256 -sign alice.key -out file.sha256.s256.sign cipher.bin 
+  189  ls
+  190  cat file.sha256.s256.sign 
+  191  openssl pkeyutl -decrypt -in cipher.bin -out data.txt -inkey bob.key 
+  192  ls
+  193  cat data.txt 
+  194  openssl dgst -sha256 -verify alice_pub.key -signature file.sha256.s256.sign data.txt 
+  195  diff data.txt txt
+  196  sha256 data.txt txt
+  197  sha256sum data.txt txt
+  198  openssl dgst -sha256 -sign alice.key -out file.sha256.s256.sign cipher.bin clear
+  199  ls
+  200  clear
+  201  ls
+  202  rm cipher.bin file.sha256.s256.sign data.txt 
+  203  ls
+  204  openssl pkeyutl -encrypt -in txt -out cipher.bin -pubin -inkey bob_pub.key 
+  205  ls
+  206  cat cipher.bin 
+  207  ls
+  208  openssl dgst -sha256 -sign alice.key -out file.txt.sha256.sig txt
+  209  ls
+  210  openssl pkeyutl -decrypt -in cipher.bin -out data.txt -inkey bob.key 
+  211  ls
+  212  cat data.txt 
+  213  openssl dgst -sha256 -verify alice_pub.key -signature file.txt.sha256.sig data.txt 
+  214  history
+  215  clear
+  216  cd /etc/ssh/
+  217  ls
+  218  sudo nano sshd_config
+  219  ssh-keygen -t RSA -b 4096
+  220  ssh-copy-id kali@192.168.100.133
+  221  ssh-copy-id kali@192.168.100.132
+  222  ssh kali@192.168.100.132
+  223  exit
+  224  nano /etc/ssh/sshd_config
+  225  systemctl restart sshd
+  226  clear
+  227  ls
+  228  cd lab/
+  229  ;s
+  230  ls
+  231  history 
+  232  ls /home/luca/Desktop/
+  233  clear
+  234  xca
+  235  mkdir fin
+  236  ls
+  237  cd fin/
+  238  ls
+  239  rm cdac.gg.crt 
+  240  cd /etc/apache2/sites-available/
+  241  ls
+  242  sudo nano cdac.gg.conf
+  243  a2ensite cdac.gg
+  244  sudo a2ensite cdac.gg
+  245  ip -br a
+  246  sudo nano /etc/hosts
+  247  host cdac.gg
+  248  a2enmod ssl
+  249  systemctl restart apache2
+  250  journalctl -xeu apache2.service
+  251  sudo nano cdac.gg.conf 
+  252  systemctl restart apache2
+  253  journalctl -xeu apache2.service
+  254  sudo nano cdac.gg.conf 
+  255  journalctl -xeu apache2.service
+  256  systemctl restart apache2
+  257  systemctl status apache2
+  258  clear
+  259  curl cdac.gg
+  260  clear
+  261  c
+  262  cd
+  263  ls
+  264  cd Documents/
+  265  ls
+  266  cd ../Downloads/
+  267  ls
+  268  clear
+  269  ls
+  270  clear
+  271  ls
+  272  clear
+  273  sl
+  274  ls
+  275  cle
+  276  clear
+  277  docker ps
+  278  clear
+  279  ls
+  280  clear
+  281  history
+  282  clear
+  283  ls
+  284  cd Documents/
+  285  ls
+  286  nano git
+  287  nano docker
+  288  lsd
+  289  ls
+  290  clear
+  291  git --version
+  292  sudo apt install jenkins
+  293  systemctl status jenkins.service 
+  294  clear
+  295  docker ps
+  296  clear
+  297  git clone https://github.com/VedantKCSE/test.git
+  298  ls
+  299  cd test/
+  300  LS
+  301  ls
+  302  cat > hello.c
+  303  nano hello.c 
+  304  gcc hello.c -o a.out
+  305  ls
+  306  git status
+  307  git add .
+  308  git statu
+  309  git status
+  310  git commit -m "1st Commit"
+  311  git push origin main
+  312  clear
+  313  ls
+  314  nano Dockerfile
+  315  ls
+  316  docker build -t c_dock:latest .
+  317  docker run c_dock:latest -dit
+  318  docker run -dit c_dock:latest
+  319  docker ps
+  320  docker run c_dock:latest
+  321  sudo apt install gcc
+  322  gcc hello.c 
+  323  ls
+  324  ./a.out 
+  325  gcc hello.c -o out
+  326  ls
+  327  ./out 
+  328  nano Dockerfile 
+  329  docker build -t c_dock:latest .
+  330  docker run -dit c_dock:latest
+  331  docker run c_dock:latest
+  332  nano Dockerfile 
+  333  docker run -dit c_dock:latest
+  334  docker build -t c_dock:latest .
+  335  docker run c_dock:latest
+  336  nano Dockerfile 
+  337  docker build -t c_dock:latest .
+  338  docker run c_dock:latest
+  339  nano Dockerfile 
+  340  docker login
+  341  docker push vedantk3/c_dock:latest 
+  342  docker push c_dock:latest 
+  343  docker build -t vedantk3/c_dock:latest .
+  344  docker push vedantk3/c_dock:latest 
+  345  history
+  346  cat hello.c 
+  347  cat Dockerfile 
+  348  clear
+  349  cd ..
+  350  mkdir pract
+  351  cd pract/
+  352  clear
+  353  mkdir web
+  354  docker run -p 7777:80 --name=ng -v ${PWD}/web:/usr/share/nginx/html:ro -d nginx
+  355  docker ps
+  356  curl localhost:7777
+  357  docker exec -it ng 
+  358  docker exec -it ng /bin/bash
+  359  docker logs ng 
+  360  docker inspect ng 
+  361  ip -br a
+  362  docker stop ng 
+  363  docker rm ng 
+  364  docker ps
+  365  docker run -p 7777:80 --name=ng -v ${PWD}/web:/usr/share/nginx/html -d nginx
+  366  docker ps
+  367  docker stop ng 
+  368  docker rm ng 
+  369  docker run -p 2222:80 --name=ng -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  370  docker ps
+  371  docker logs ng 
+  372  docker exec -it ng /bin/bash
+  373  docker logs ng 
+  374  docker rm ng 
+  375  docker stop ng 
+  376  docker rm ng 
+  377  docker ps
+  378  docker run -p 2222:80 --name=ng123456 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  379  docker logs ng123456 
+  380  curl localhost:2222
+  381  curl localhost
+  382  docker stop ng123456 
+  383  docker rm ng123456 
+  384  docker run -p 1235:80 --name=ng1234567890 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  385  lsof -i:1235
+  386  lsof -i:80
+  387  curl localhost:1235
+  388  ip a
+  389  docker run -p -it 127.0.0.1:1235:80 --name=ng1234567890 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  390  docker run -it -p 127.0.0.1:1235:80 --name=ng1234567890 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  391  docker stop ng1234567890 
+  392  docker rm ng1234567890 
+  393  docker run -it -p 127.0.0.1:1235:80 --name=ng123 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  394  curl 127.0.0.1
+  395  docker stop ng123
+  396  docker rm ng123
+  397  docker run -it -p 127.0.0.1:1235:80 --name=ng123 --net=host -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  398  curl 127.0.0.1:1235
+  399  docker ps
+  400  docker rm ng123 
+  401  docker run -it -p --name=ng123 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  402  docker run -it -p 8888:80 --name=ng123 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  403  docker ps
+  404  curl localhost:888
+  405  curl localhost:8888
+  406  docker run -it -p 8888:80 --name=ng123 -d nginx
+  407  docker run -it -p 8888:80 --name=ngat123 -d nginx
+  408  docker run -it -p 8889:80 --name=ngat123 -d nginx
+  409  docker ps
+  410  docker stop ng123 
+  411  docker rm 'ng123 
+  412  docker rm ng123 
+  413  docker run -it -p 8889:80 --name=ngat123 -d nginx
+  414  docker rm ngat123 
+  415  docker run -it -p 8889:80 --name=ngat123 -d nginx
+  416  curl localhost:8889
+  417  docker  network ls
+  418  docker run -it -p 5555:80 --name=appa -d httpd
+  419  docker ps
+  420  curl localhost:5555
+  421  systemctl restart docker
+  422  docker ps
+  423  docker ps -a
+  424  docker rm appa 
+  425  docker rm ngat123 
+  426  docker rm mystifying_brahmagupta 
+  427  docker rm wizardly_hugle 
+  428  docker rm quirky_einstein 
+  429  docker rm sleepy_goldstine 
+  430  docker rm ecstatic_merkle 
+  431  docker rm focused_keller 
+  432  docker rm trusting_feynman 
+  433  docker rm peaceful_satoshi 
+  434  docker ps -a
+  435  docker run -it -p 5555:80 --name=appa -d httpd
+  436  docker logs appa 
+  437  docker run -it -p 8887:80 --name=ng123 -v ${PWD}/web/:/usr/share/nginx/html -d nginx
+  438  docker logs ng123 
+  439  ls
+  440  history
+  441  docker run -it -p 5557:80 --name=appa2 -d apache2
+  442  docker run -it -p 5557:80 --name=appa2 -d ubuntu/apache2
+  443  curl localhost:5557
+  444  history | tail
+  445  history | tail -n 20
+  446  cd ..
+  447  git clone https://github.com/VedantKCSE/hackdash.git
+  448  ls
+  449  cd test
+  450  ls
+  451  nano Dockerfile 
+  452  clar
+  453  clear
+  454  cd pract/
+  455  cd web/
+  456  cat index.html
+  457  cat > index.html
+  458  clear
+  459  ls
+  460  aws
+  461  sudo snap install aws-cli --classic
+  462  aws --version
+  463  kubectl
+  464  clear
+  465  ls
+  466  clear
+  467  ls
+  468  clear
+  469  cd Documents/
+  470  ls
+  471  cd Documents/
+  472  ls
+  473  cat docke
+  474  cat docker 
+  475  cat git 
+  476  clear
+  477  cd ..
+  478  la
+  479  clear
+  480  ls
+  481  docker
+  482  clear
+  483  ls
+  484  clear
+  485  ls
+  486  cear
+  487  clear
+  488  docker ps
+  489  docker ps a
+  490  docker ps -a
+  491  docker rm appa2 
+  492  docker rm ng123 
+  493  docker rm appa 
+  494  docker ps -a
+  495  clear
+  496  ls
+  497  cd test/
+  498  ls
+  499  cd ../pract/
+  500  lss
+  501  ls
+  502  cd ../Downloads/
+  503  ls
+  504  git clone https://github.com/VedantKCSE/hp.git
+  505  ls
+  506  cd hp/
+  507  ls
+  508  clear
+  509  clea
+  510  clear
+  511  ls
+  512  nano hi.sh 
+  513  git status
+  514  git add .
+  515  git status
+  516  git commit -m "Test Day"
+  517  git push
+  518  git status
+  519  git log --graph
+  520  git branch
+  521  git checkout -b b1
+  522  git branch
+  523  git switch main 
+  524  git branch
+  525  git switch b1
+  526  git branch
+  527  ls
+  528  nano hello.py 
+  529  git status
+  530  git add .
+  531  git commit -m "To new branch"
+  532  git push
+  533  git push origin b1
+  534  git merge b1 
+  535  git switch main 
+  536  git switch b1 
+  537  git merge main 
+  538  git switch main 
+  539  git merge b1 
+  540  git status
+  541  git push origin main
+  542  git log --graph
+  543  clear
+  544  history
+  545  history | awk "print $2"
+  546  history | awk "{print $2}"
+  547  history | awk "{print $2}"clear
+  548  clar
+  549  clear
+  550  docker run -dit busybox
+  551  docker exec -it 47 /bin/bash
+  552  docker ps
+  553  docker exec -it 47 sh
+  554  clear
+  555  docker ps
+  556  docker stop 47
+  557  docker rm 47
+  558  docker ps -a
+  559  docker run --name=labex -d -p 6000:80 nginx:latest
+  560  docker ps
+  561  ip -br a
+  562  curl 192.168.100.133:6000
+  563  docker ps -a
+  564  docker stop 7f && docker rm 7f
+  565  docker ps -a
+  566  ls
+  567  mkdir web
+  568  pwd
+  569  nano web/index.html
+  570  docker run -d --name=voln -v ${PWD}/web:/usr/share/nginx/html -p 5678:80 nginx:latest 
+  571  docker ps
+  572  curl 192.168.100.133:6000
+  573  curl 192.168.100.133:5678
+  574  docker stop fd && docker rm fd
+  575  docker run -d --name=mysql -e MYSQL_USER=don -e MYSQL_PASSWORD=don123 -e MYSQL_DATABASE=my_db -e MYSQL_ROOT_PASSWORD=don123 -p 14316:3308 mysql:8
+  576  dockee exec -it cd mysql
+  577  docker ps
+  578  docker exec -it cd mysql
+  579  docker exec -it cd16 mysql -u root -p
+  580  docker ps -a
+  581  docker stop cd && docker rm cd
+  582  ls
+  583  nano Dockerfile 
+  584  docker build -t vedantk3/python_bro:latest .
+  585  docker run vedantk3/python_bro:latest 
+  586  docker push
+  587  docker push vedantk3/python_bro:latest 
+  588  docker ps -a
+  589  docker stop 04d1 && docker rm 04
+  590  docker ps -a
+  591  clear
+  592  docker run -dit --name=apache -p 8970:80 kstaken/apache:latest
+  593  docker run -dit --name=apache -p 8970:80 kstaken/apache2:latest
+  594  docker ps -a
+  595  docker run -dit --name=apache -p 8970:80 kstaken/apache2
+  596  docker ps -a
+  597  docker list
+  598  docker --list
+  599  docker images
+  600  clear
+  601  nano docker-compose.yaml
+  602  ls
+  603  docker compose up
+  604  nano docker-compose.yaml
+  605  docker compose up
+  606  nano docker-compose.yaml
+  607  docker compose up
+  608  nano docker-compose.yaml
+  609  curl localhost:8090
+  610  nano Dockerfile 
+  611  docker compose down
+  612  docker compose up
+  613  docker compose down
+  614  nano docker-compose.yaml
+  615  nano Dockerfile 
+  616  docker compose up
+  617  ls
+  618  cd web/
+  619  mv ../docker-compose.yaml 
+  620  mv ../docker-compose.yaml .
+  621  mv ../Dockerfile .
+  622  ls
+  623  docker compose up
+  624  nano docker-compose.yaml 
+  625  nano Dockerfile 
+  626  docker compose up
+  627  docker ps -a
+  628  docker stop e33 && docker rm e33
+  629  docker compose up
+  630  docker compose -d up
+  631  docker compose up
+  632  nano Dockerfile 
+  633  docker compose down
+  634  docker ps -a
+  635  docker compose up
+  636  nano docker-compose.yaml 
+  637  docker run busybox echo "hello world"
+  638  docker run busybox
+  639  docker run busybox echo "hello world"
+  640  docker run busybox echo "hello worldrtyuiop"
+  641  docker run busybox pwd
+  642  docker run busybox ls
+  643  docker run busybox ip a
+  644  docker ps
+  645  docker ps-a
+  646  docker ps -a
+  647  docker rm dd
+  648  docker rm 1b
+  649  docker rm 58
+  650  docker rm 41
+  651  docker rm 0b
+  652  docker rm 4f
+  653  docker rm 1a
+  654  docker stop 24 && docker rm 24
+  655  docker ps -a
+  656  clear
+  657  kubectl create deployment myng --image nginx
+  658  kubectl get pods
+  659  kubectl rm my
+  660  kubectl delete my
+  661  kubectl delete myng-db5999468-t9qsf
+  662  kubectl delete pod myng-db5999468-t9qsf
+  663  ls
+  664  kubectl get pods
+  665  kubectl delete pod myng-db5999468-5zpzt
+  666  kubectl get pods
+  667  kubectl delete deployment myng
+  668  kubectl get pods
+  669  kubectl create deployment myng --image nginx
+  670  kubectl scale deployment myng --replicas 5
+  671  kubectl get pods
+  672  kubectl expose deployment myng --type=NodePort --port=80
+  673  kubectl get pods
+  674  kubectl get svc
+  675  curl localhost:30845
+  676  kubectl delete deployment myng
+  677  kubectl get pods
+  678  cd ~
+  679  mkdir sql
+  680  cd sql/
+  681  docker run -d -name my-sql -e MYSQL_USER=natasha MYSQL_PASSWORD=user@123@123? MYSQL_DATABASE=my_db MYSQL_ROOT_PASSWORD=server@123@?
+  682  docker run -d --name mysql_database -e MYSQL_USER=natasha MYSQL_PASSWORD=user@123@123? MYSQL_DATABASE=my_db MYSQL_ROOT_PASSWORD=server@123@?
+  683  docker run -d --name mysql_database -e MYSQL_USER=natasha MYSQL_password=user@123@123? MYSQL_DATABASE=my_db MYSQL_ROOT_PASSWORD=server@123@?
+  684  docker run -d --name mysql_database -e MYSQL_USER=natasha mysql_password=user@123@123? MYSQL_DATABASE=my_db MYSQL_ROOT_PASSWORD=server@123@?
+  685  docker run -d --name=mysql_db -e MYSQL_USER=don -e MYSQL_PASSWORD=don123 -e MYSQL_DATABASE=my_db -e MYSQL_ROOT_PASSWORD=root@123 -p 14316:3308 mysql:8
+  686  docker exec -it mysql_db /bin/bash
+  687  docker exec -it mysql_db 
+  688  docker exec -it mysql_db mysql -u root -p
+  689  kubectl create deployment myng --image nginx
+  690  kubectl scale deployment myng --replicas 5
+  691  kubectl get pods
+  692  curl localhost:30845
+  693  kubectl delete deployment myng
+  694  cd ~
+  695  hirtory > hist
+  696  history > hist
