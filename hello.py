@@ -1,1 +1,1 @@
-print("We have a Succesfull GitHub <-> Jenkins <-> Docker Workflow 😁")
+print("We have a Succesfull Test GitHub <-> Jenkins <-> Docker Workflow 😁")
