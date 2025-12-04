@@ -1,0 +1,1134 @@
+====================================================================
+PORT FORWARDING 
+============================================================
+
+â†’ When a request comes from WAN (NAT IP),
+â†’ Router/firewall checks PREROUTING chain first
+â†’ PREROUTING allows us to change the destination IP
+â†’ This is called DNAT (Destination NAT)
+
+============================================================
+2) PORT FORWARDING TO CLIENT 1 (PORT 80)
+
+Client 1:
+â†’ Webserver running on 192.168.20.5:80
+(This is shown in PDF page 1)
+
+
+Untitled document (4)
+
+We want:
+â†’ Base machine (host PC) to open:
+http://<firewall NAT IP>:80
+â†’ It should reach client 1â€™s webserver.
+
+Add DNAT rule in PREROUTING:
+
+Command:
+sudo iptables -t nat -A PREROUTING -i ens160 -p tcp --dport 80 -j DNAT --to-destination 192.168.20.5:80
+
+
+Untitled document (4)
+
+Now check PREROUTING table:
+sudo iptables -t nat -L
+
+Test:
+â†’ Open browser on base machine
+â†’ Type: <NAT IP>:80
+â†’ You should see Client 1 webpage
+
+============================================================
+3) WHY DO WE NEED A SECOND PORT FOR CLIENT 2?
+
+Port 80 is already used by Client 1.
+
+So if we want Client 2 to also have a webserver:
+â†’ We must use a different port on WAN side
+â†’ Choose port 81 for Client 2
+(As mentioned on page 1 bottom)
+
+
+Untitled document (4)
+
+============================================================
+4) PORT FORWARDING TO CLIENT 2 (PORT 81 â†’ 80)
+
+Client 2 webserver:
+192.168.20.10:80
+
+Add rule:
+
+Command:
+sudo iptables -t nat -A PREROUTING -p tcp -i ens160 --dport 81 -j DNAT --to-destination 192.168.20.10:80
+
+
+Untitled document (4)
+
+Test:
+â†’ Open base machine browser
+â†’ Type: <NAT IP>:81
+â†’ This should display Client 2â€™s webserver.
+
+============================================================
+5) FINAL RESULT
+
+Client 1 website:
+â†’ http://<NAT IP>:80
+(forwarded to 192.168.20.5:80)
+
+Client 2 website:
+â†’ http://<NAT IP>:81
+(forwarded to 192.168.20.10:80)
+
+Both webservers can run at the same time
+because they use different external ports.
+
+====================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================================================
+
+====================================================================
+SQUID PROXY 
+
+============================================================
+
+SQUID PROXY BASICS (from PDF page 1)
+============================================================
+
+Squid proxy works on port: 3128
+
+
+Untitled document (3)
+
+Squid firewall â†’ works up to Application Layer
+(Shown in diagram on page 1)
+
+ACL TYPES supported:
+â†’ src = source IP
+â†’ dst = destination IP
+â†’ srcdomain = source domain
+â†’ dstdomain = destination domain
+â†’ url_regex = URL content
+â†’ time = time-based blocking
+
+
+Untitled document (3)
+
+Basic ACL format:
+acl <name> <type> <value>
+
+Examples:
+acl client1 src 192.168.20.5
+acl mynet src 192.168.20.0/24
+
+
+Untitled document (3)
+
+Apply ACL:
+acl microsoft dstdomain microsoft.com
+http_access deny microsoft client1
+
+
+Untitled document (3)
+
+============================================================
+2) IMPORTANT SQUID RULE ORDER (from PDF page 2)
+
+NOTE:
+â†’ Squid works ONLY for HTTP/Web traffic
+
+
+Untitled document (3)
+
+RULE ORDER:
+
+Allow rules must be written FIRST
+
+Block rules AFTER allow rules
+
+If you want:
+â†’ Allow few â†’ Block remaining
+OR
+â†’ Block few â†’ Allow remaining
+
+
+Untitled document (3)
+
+============================================================
+3) INSTALL SQUID PROXY
+
+Install:
+sudo dnf install squid -y
+(or yum/apt as applicable)
+
+
+Untitled document (3)
+
+Add INPUT rule for squid:
+sudo iptables -I INPUT 1 -s 192.168.20.0/24 -p tcp --dport 3128 -j ACCEPT
+
+
+Untitled document (3)
+
+Squid cache directory:
+Location â†’ /var/spool/squid
+
+
+Untitled document (3)
+
+Open squid config:
+sudo nano /etc/squid/squid.conf
+
+============================================================
+4) EDIT SQUID CONFIG (from PDF page 3)
+
+Uncomment disk cache line:
+
+Uncomment the directory line shown inside config
+
+Untitled document (3)
+
+Squid cache structure:
+â†’ var/spool/squid
+â†’ 16 directories Ã— each having 256 subdirs
+
+Set visible hostname:
+visible_hostname proxy.boss.error
+
+
+Untitled document (3)
+
+Start squid:
+sudo systemctl start squid
+sudo systemctl enable squid
+
+Check folders:
+ls /var/spool/squid
+â†’ You will see multiple directories (as shown on page 3)
+
+
+Untitled document (3)
+
+============================================================
+5) CONFIGURE CLIENT FOR PROXY (page 3)
+
+Client1:
+sudo nmtui
+â†’ Remove default gateway
+â†’ Remove DNS entries
+
+Browser Settings â†’ Search â€œproxyâ€ â†’ Manual Proxy
+â†’ HTTP proxy = Firewall machine IP
+â†’ Port = 3128
+â†’ Enable checkbox
+â†’ OK
+
+
+Untitled document (3)
+
+============================================================
+6) ADDING RULES IN SQUID (page 4)
+
+Open squid config:
+sudo vi /etc/squid/squid.conf
+
+Add ACLs (from PDF highlighted section):
+acl mynet src 192.168.20.0/24
+acl client1 src 192.168.20.5
+acl client2 src 192.168.20.10
+acl google dstdomain .google.com
+acl microsoft dstdomain .microsoft.com
+acl redhat dstdomain .redhat.com
+
+
+Untitled document (3)
+
+Allow specific websites:
+http_access allow google mynet
+http_access allow microsoft client1
+http_access allow redhat client2
+
+Block everything else:
+http_access deny mynet
+
+
+Untitled document (3)
+
+============================================================
+7) RELOAD VS RESTART (IMPORTANT)
+
+Reload:
+sudo systemctl reload squid.service
+â†’ reload = apply changes without stopping service
+
+Restart:
+â†’ restart = stops and starts squid (not recommended)
+
+
+Untitled document (3)
+
+============================================================
+8) TESTING RESULT (from PDF images)
+
+If allowed sites:
+â†’ google.com, microsoft.com, redhat.com
+will open normally
+(see screenshots page 4)
+
+If blocked:
+â†’ user gets â€œproxy server is refusing connectionsâ€
+shown on last page
+
+
+Untitled document (3)
+
+============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================================================
+====================================================================
+FAIL2BAN â€“ DETAILED NOTEPAD VERSION
+
+============================================================
+
+WHY FAIL2BAN IS USED (PDF explanation)
+============================================================
+
+â†’ Client1 tries SSH on firewall
+â†’ Enters wrong password repeatedly
+â†’ Possible brute-force / dictionary attack
+
+
+Untitled document (5)
+
+Fail2ban works like this:
+â†’ If wrong password entered 3 times â†’ ban for 10 minutes
+â†’ After 10 minutes, if he tries again â†’ ban increases (ex: 20 min)
+â†’ Helps block attackers automatically
+
+============================================================
+2) INSTALL FAIL2BAN
+
+sudo dnf update -y
+sudo dnf install epel-release -y
+sudo dnf update -y
+sudo dnf install fail2ban -y
+
+
+Untitled document (5)
+
+============================================================
+3) CREATE FAIL2BAN LOCAL CONFIG FILES
+
+Copy main config:
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+
+Untitled document (5)
+
+Create SSH-specific jail rule:
+sudo vim /etc/fail2ban/jail.d/sshd.local
+
+Add the following inside file:
+
+[sshd]
+enabled = true
+findtime = 3600
+maxretry = 3
+bantime = 10m
+
+Explanation:
+â†’ findtime = 1 hour (time window to count failures)
+â†’ maxretry = 3 wrong passwords allowed
+â†’ bantime = ban for 10 minutes
+
+
+Untitled document (5)
+
+============================================================
+4) START FAIL2BAN SERVICE
+
+sudo systemctl start fail2ban
+sudo systemctl enable fail2ban
+
+
+Untitled document (5)
+
+Fail2ban is now active and protecting SSH.
+
+============================================================
+5) TEST FAIL2BAN
+
+From another client (ex: Client2):
+â†’ Try to SSH into Firewall
+â†’ Enter wrong password 3 times
+
+Fail2ban will:
+â†’ Immediately block client IP
+â†’ Ban lasts 10 minutes
+
+============================================================
+6) CHECK FAIL2BAN STATUS
+
+List all jails:
+sudo fail2ban-client status
+
+
+Untitled document (5)
+
+See specific jail:
+sudo fail2ban-client status sshd
+
+============================================================
+7) DEFAULT BAN TIME (from PDF)
+
+Default bantime = 10 minutes
+
+
+Untitled document (5)
+
+============================================================
+8) HOW TO UNBAN AN IP (VERY IMPORTANT)
+
+sudo fail2ban-client set sshd unbanip 192.168.20.5
+
+
+Untitled document (5)
+
+After unban:
+â†’ Client can attempt SSH again
+
+====================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================================================
+====================================================================
+DMZ NETWORK SETUP â€“ DETAILED STEPS
+
+
+============================================================
+
+UNDERSTANDING DMZ (from page 1 image)
+============================================================
+
+DMZ = â€œDemilitarized Zoneâ€
+â†’ Area between WAN (internet) and LAN
+â†’ Public-facing servers (web, ftp) stay in DMZ
+â†’ Internal LAN servers stay protected behind firewall
+
+Diagram on PDF page 1 shows:
+WAN â†’ Firewall â†’ DMZ â†’ LAN
+
+
+Untitled document (2)
+
+============================================================
+2) CREATE DMZ NETWORK IN VMWARE
+
+Step 1:
+VMware â†’ Edit â†’ Virtual Network Editor â†’ Change Settings â†’ Yes
+
+Step 2:
+Add Network â†’ vmnet2 â†’ OK â†’ Apply â†’ OK
+â†’ Set this network to 192.168.50.0 network
+
+
+Untitled document (2)
+
+This vmnet2 is your DMZ network.
+
+============================================================
+3) CONFIGURE VM ADAPTERS (from page 2 images)
+
+Firewall VM:
+â†’ Add Adapter â†’ Custom â†’ vmnet2 (DMZ interface)
+
+Client 1 (LAN):
+â†’ Adapter: vmnet1 or host-only (192.168.20.x network)
+
+Client 2 (DMZ):
+â†’ Adapter: vmnet2 (192.168.50.x network)
+
+
+Untitled document (2)
+
+Overall setup (page 2 diagram):
+Firewall
+â†’ ens160 = external network (NAT)
+â†’ ens192 = LAN (192.168.20.0/24)
+â†’ ens256 = DMZ (192.168.50.0/24)
+
+============================================================
+4) ASSIGN IP ADDRESSES USING nmtui
+
+On Client 1 (LAN):
+sudo nmtui
+â†’ IPv4 Manual
+â†’ Address: 192.168.20.10/24
+â†’ Gateway: 192.168.20.5
+â†’ DNS: 192.168.72.20
+
+
+Untitled document (2)
+
+Check:
+ip -br a
+
+On Client 2 (DMZ):
+sudo nmtui
+â†’ IPv4 Manual
+â†’ Address: 192.168.50.10/24
+â†’ Gateway: 192.168.50.5
+â†’ DNS: 192.168.72.20
+
+
+Untitled document (2)
+
+Firewall interface IPs (page 4):
+ens160 â†’ external
+ens192 â†’ 192.168.20.5
+ens256 â†’ 192.168.50.5
+
+
+Untitled document (2)
+
+============================================================
+5) IPTABLES RULES ON FIREWALL
+============================================================
+5.1 NAT MASQUERADING (Internet Access)
+
+For Client 1 (LAN 192.168.20.0/24):
+sudo iptables -t nat -A POSTROUTING -o ens160 -s 192.168.20.0/24 -j MASQUERADE
+
+
+Untitled document (2)
+
+For Client 2 (DMZ 192.168.50.0/24):
+sudo iptables -t nat -A POSTROUTING -o ens160 -s 192.168.50.0/24 -j MASQUERADE
+
+
+Untitled document (2)
+
+============================================================
+5.2 DNS ALLOW RULES FOR BOTH CLIENTS
+
+For LAN:
+sudo iptables -I FORWARD 1 -s 192.168.20.0/24 -d 192.168.72.20 -p udp --dport 53 -j ACCEPT
+sudo iptables -I FORWARD 2 -d 192.168.20.0/24 -s 192.168.72.20 -p udp --sport 53 -j ACCEPT
+
+
+Untitled document (2)
+
+For DMZ:
+sudo iptables -I FORWARD 1 -s 192.168.50.0/24 -d 192.168.72.20 -p udp --dport 53 -j ACCEPT
+sudo iptables -I FORWARD 2 -d 192.168.50.0/24 -s 192.168.72.20 -p udp --sport 53 -j ACCEPT
+
+
+Untitled document (2)
+
+============================================================
+5.3 ALLOW DMZ CLIENT TO ACCESS HTTPS WEBSITES
+
+sudo iptables -I FORWARD 3 -s 192.168.50.0/24 -p tcp --dport 443 -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -I FORWARD 4 -d 192.168.50.0/24 -p tcp --sport 443 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+
+Untitled document (2)
+
+Result â†’ DMZ client can access browser now.
+
+============================================================
+6) PORT FORWARDING (DNAT) FROM WAN â†’ DMZ WEB SERVER
+
+Scenario:
+â†’ DMZ web server at 192.168.50.10 should be reachable from WAN
+
+Add rules:
+
+Forward HTTP traffic:
+sudo iptables -t nat -A PREROUTING -i ens160 -p tcp --dport 80 -j DNAT --to-destination 192.168.50.10:80
+
+Allow traffic towards DMZ:
+sudo iptables -I FORWARD 1 -d 192.168.50.10 -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+
+Allow traffic coming back:
+sudo iptables -I FORWARD 2 -s 192.168.50.10 -p tcp --sport 80 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+
+Untitled document (2)
+
+Now:
+â†’ Your base machine can open the website using firewall WAN IP.
+
+============================================================
+7) SSH FROM LAN TO DMZ
+
+ON FIREWALL:
+Allow LAN â†’ DMZ SSH:
+sudo iptables -I FORWARD 1 -s 192.168.20.10 -d 192.168.50.10 -p tcp --dport 22 -j ACCEPT
+sudo iptables -I FORWARD 2 -d 192.168.20.10 -s 192.168.50.10 -p tcp --sport 22 -j ACCEPT
+
+
+Untitled document (2)
+
+ON DMZ CLIENT (Client 2):
+Enable SSH on firewall:
+sudo firewall-cmd --add-service=ssh --permanent
+sudo firewall-cmd --reload
+
+ON LAN CLIENT (Client 1):
+ssh 192.168.50.10
+or
+ssh boss@192.168.50.10
+
+
+Untitled document (2)
+
+============================================================
+8) USEFUL COMMANDS
+
+List forwarding rules:
+sudo iptables -L FORWARD -n --line-numbers
+
+Check interfaces:
+ip -br a
+
+Restart network:
+sudo systemctl restart NetworkManager
+
+====================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+======================================================================================
+
+====================================================================
+SURICATA ON PFSENSE (DETAILED STEPS)
+
+
+============================================================
+
+INSTALL SURICATA
+============================================================
+
+Go to:
+System â†’ Package Manager â†’ Available Packages â†’ Search "suricata" â†’ Install
+
+Wait for installation to finish.
+
+============================================================
+2) BASIC SURICATA GLOBAL SETTINGS
+
+Go to:
+Services â†’ Suricata â†’ Global Settings
+
+Enable the first checkbox:
+â†’ "Enable Global Logging" (or similar depending on version)
+
+Next:
+Enable:
+â†’ Blacklist
+â†’ ET/Open or ETOpen/FIDO ruleset
+
+Set update frequency:
+â†’ 6 hours
+
+Click Save.
+
+Now go to:
+Updates tab â†’ Click "Update"
+Wait for all rule sets to download.
+
+============================================================
+3) IMPORTANT SYSTEM TUNING (VERY IMPORTANT)
+
+Go to:
+System â†’ Advanced â†’ Networking
+
+Enable the first 3 checkboxes:
+â†’ Hardware Checksum Offloading
+â†’ Hardware TCP Segmentation Offloading
+â†’ Hardware Large Receive Offloading
+
+Scroll â†’ Save
+
+Reboot pfSense:
+System â†’ Reboot
+
+============================================================
+4) ADD SURICATA TO WAN INTERFACE
+
+Go to:
+Services â†’ Suricata â†’ Interfaces â†’ Add
+
+Add interface:
+â†’ Interface: WAN
+Save
+
+Select newly added WAN:
+Services â†’ Suricata â†’ Interfaces â†’ WAN
+
+Below section:
+â†’ WAN Rule Category â†’ Choose "Custom Rules" (if shown)
+
+Now add a custom rule.
+
+============================================================
+5) ADD CUSTOM ALERT RULES
+
+Go to:
+Services â†’ Suricata â†’ Interfaces â†’ WAN â†’ Scroll to "Custom Rules" section â†’ Edit
+
+Add rule:
+
+alert icmp any any -> 8.8.8.8 any (msg:"ping to google bhai"; sid:10000001; rev:0001;)
+
+Example FTP rule:
+alert tcp any any -> any 21 (msg:"FTP marala hana yala"; sid:2222222; rev:1;)
+
+Save changes.
+
+Now test alerts.
+
+============================================================
+6) TEST ALERT GENERATION
+
+On client:
+ping 8.8.8.8
+Or test FTP:
+ftp 192.168.x.x or any FTP server
+
+Then on pfSense:
+Services â†’ Suricata â†’ Logs â†’ Alerts Tab
+
+â†’ You should see alerts listed.
+If alerts appear â†’ Suricata ALERT mode is working.
+
+============================================================
+7) ENABLE BLOCKING MODE (IPS MODE)
+
+To turn Suricata from ALERT â†’ BLOCK:
+
+Go to:
+Services â†’ Suricata â†’ Interfaces â†’ WAN â†’ Edit
+
+Scroll down:
+Find: "Block Offenders" or "IPS Mode"
+â†’ Check âœ” (Enable Blocking)
+
+Scroll â†’ Save
+
+Now Suricata will drop/block packets that match rules.
+
+============================================================
+8) TEST BLOCKING
+
+From client, try:
+ftp <ftp-server-ip>
+or ping 8.8.8.8 (if rule is for ICMP)
+
+Then check in pfSense:
+Services â†’ Suricata â†’ Logs â†’ Blocks Tab
+
+â†’ Block entry should appear.
+This confirms Suricata IPS is working.
+
+============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+====================================================================
+PFSENSE FIREWALL â€“ DETAILED STEPS
+CLEAN NOTEPAD VERSION WITH â†’ ARROWS
+
+============================================================
+
+DOWNLOAD & INSTALL PFSENSE
+============================================================
+
+Download ISO:
+https://www.pfsense.org/download/
+
+Setup VM:
+â†’ Use 3 network adapters
+1) NAT
+2) Host-only
+3) Host-only
+â†’ During installation always select NAT interface for WAN
+
+Start installation normally.
+
+============================================================
+2) AFTER INSTALLATION
+
+Default login:
+Username: admin
+Password: pfsense
+
+Open browser on host:
+â†’ Type: https://<your-pfsense-LAN-IP>
+
+Go through Setup Wizard:
+System â†’ Setup Wizard â†’ Next
+â†’ Primary DNS = 8.8.8.8
+â†’ Secondary DNS = 8.8.4.4
+â†’ Next â†’ Next â†’ Reload â†’ Finish
+â†’ Click "Update"
+
+============================================================
+3) CONFIGURE CLIENT IP ADDRESSES
+
+Client 1 â†’ 192.168.20.20
+Client 2 â†’ 192.168.20.30
+
+On each client:
+â†’ Network settings â†’ Assign manual IP
+â†’ Gateway = pfSense LAN IP
+â†’ DNS = same pfSense LAN IP or 8.8.8.8
+
+Test:
+Open terminal:
+ping 192.168.20.132 (pfSense LAN IP)
+
+====================================================================
+4) FIREWALL RULE: BLOCK PING FROM CLIENT TO DNS SERVER
+
+Requirement:
+Block ping from clients â†’ DNS server 192.168.72.20
+
+Steps:
+pfSense GUI â†’ Firewall â†’ Rules â†’ LAN â†’ Add (up arrow icon)
+
+Edit rule:
+Action â†’ Block
+Interface â†’ LAN
+Source â†’ Any
+Destination â†’ 192.168.72.20
+Enable Log â†’ check âœ”
+Save â†’ Apply Changes
+
+IMPORTANT:
+Rule must be at TOP
+â†’ Drag rule â†‘ to the top
+â†’ Save â†’ Apply
+
+Check on client:
+ping 192.168.72.20
+It should fail.
+
+====================================================================
+5) INSTALL SQUID (WEB PROXY)
+
+Dashboard â†’ System â†’ Package Manager â†’ Available Packages
+â†’ Search: squid
+â†’ Install squid
+
+Configure Squid:
+Services â†’ Squid Proxy Server â†’ General
+â†’ Enable Squid Proxy âœ”
+â†’ Proxy Interface(s) â†’ LAN + Loopback
+â†’ Logging Settings â†’ check first box
+
+Local Cache (next tab):
+â†’ Hard Disk Cache Size = 1024
+Save.
+
+On client browser:
+â†’ Configure Manual Proxy
+IP = pfSense LAN IP
+Port = default squid port (3128)
+
+====================================================================
+6) INSTALL SQUIDGUARD (WEB FILTER)
+
+Dashboard â†’ System â†’ Package Manager â†’ Available Packages
+â†’ Search: squidguard
+â†’ Install
+
+Download blacklist:
+Google â†’ search: pfsense blacklist index of
+Use link:
+https://dsi.ut-capitole.fr/blacklists/download/
+
+Configure:
+Services â†’ SquidGuard Proxy Filter
+General Settings â†’ scroll down
+â†’ Check "Blacklist"
+â†’ Paste blacklist URL
+â†’ Save
+
+Go to Blacklist (header):
+â†’ Paste URL again
+â†’ Click Download
+
+Enable SquidGuard:
+General Settings â†’ Enable âœ”
+Save â†’ Apply
+
+====================================================================
+7) CREATE TARGET CATEGORY & ACL RULES
+============================================================
+CASE 1: SALES DEPARTMENT
+Allow: shopping, social media
+Block: all other websites
+
+Create user
+Services â†’ Squid Proxy Server â†’ User
